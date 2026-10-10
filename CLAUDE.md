@@ -16,8 +16,63 @@ données Facebook et LinkedIn, analytics web et SEO, supervision WordPress, repo
    d'environnement ; `.env` est ignoré par git, `.env.example` ne contient que des valeurs
    locales factices. Les images Docker ne reçoivent aucune variable à la construction.
 
+5. **Le cloisonnement par entité est appliqué par la base, jamais par le seul code
+   applicatif.** Toute lecture métier passe par `withTenant`, sous le rôle `hilaac_app`
+   soumis à Row Level Security (voir « Cloisonnement » ci-dessous).
+
 Interdits : Vercel, fonctions serverless, ORM autre que Drizzle, état serveur dans le
 navigateur (le navigateur n'est qu'une vue ; la source de vérité est Postgres).
+
+## Cloisonnement (RLS)
+
+**Rôles Postgres** — un rôle par usage, une URL par rôle dans l'environnement :
+
+| Rôle            | Variable              | Usage                                                            |
+| --------------- | --------------------- | ---------------------------------------------------------------- |
+| `hilaac`        | `DATABASE_URL`        | propriétaire : migrations et seed uniquement                     |
+| `hilaac_app`    | `DATABASE_URL_APP`    | requêtes métier de apps/web, soumis à RLS, lecture seule         |
+| `hilaac_auth`   | `DATABASE_URL_AUTH`   | Better Auth : `utilisateur`, `session`, `compte`, `verification` |
+| `hilaac_worker` | `DATABASE_URL_WORKER` | apps/worker, `BYPASSRLS` ; jamais le rôle applicatif             |
+| `hilaac_rls`    | —                     | `NOLOGIN BYPASSRLS`, propriétaire des fonctions de périmètre     |
+
+Les mots de passe ne sont jamais dans les migrations : `db:migrate` les pose à partir des URL.
+
+**Point d'entrée unique** : `withTenant({ utilisateurId, entiteId }, fn)` (`packages/db/src/tenant.ts`)
+ouvre une transaction et pose `app.user_id` et `app.tenant_id` (`SET LOCAL`). `entiteId` vaut un
+uuid ou `TOUTES_LES_ENTITES`. Un client est toujours appelé avec son `entiteId` de session ;
+aucun paramètre d'URL n'entre dans son périmètre.
+
+**Policies** : toute table portant `entite_id` (et `entite`, `utilisateur`) est en `ENABLE` +
+`FORCE ROW LEVEL SECURITY`. Les policies appellent `app.entite_autorisee(entite_id)`,
+`app.projet_visible(projet_id)` et `app.utilisateur_visible(id)` (`migrations/0002_securite_rls.sql`) :
+
+- admin, direction, lead : toutes les entités ; membre : les entités de `suivi_entite`
+  (aucune ligne = rien, fail-closed) ; rôles client : leur `utilisateur.entite_id` seulement.
+- un membre ne voit que les projets où il a une ligne `affectation_projet`, plus les tâches
+  dont il est responsable.
+- un client ne voit que les utilisateurs de son entité et ceux qui y interviennent (auteur,
+  responsable, affecté). La colonne `email` n'est accordée qu'à `hilaac_auth`.
+- sans contexte posé, aucune ligne n'est visible.
+
+**Ne jamais** rendre une fonction de périmètre propriété d'un rôle soumis à RLS : elle lirait
+`suivi_entite` ou `utilisateur` à travers les policies qui l'appellent (récursion, ou zéro ligne
+en silence). Le test « pas de récursion » de `isolation.test.ts` échoue dans ce cas.
+
+**Nouvelle table métier** : colonne `entite_id`, clé étrangère composite `(parent_id, entite_id)`
+vers son parent (unique `(id, entite_id)` côté parent), RLS + policy dans une migration, droits
+`SELECT` pour `hilaac_app` et lecture-écriture pour `hilaac_worker`, et une ligne dans `TABLES_CLOISONNEES` du test
+d'isolation.
+
+**À venir (livrable suivant)** : l'assignation d'une tâche devra créer la ligne
+`affectation_projet` correspondante, sinon le responsable voit sa tâche sans voir son projet.
+
+## Authentification
+
+Better Auth (e-mail et mot de passe, sessions en base) dans `apps/web/src/lib/auth.ts`, sur la
+connexion `hilaac_auth`. Deux surfaces : `/connexion` (équipe → `/app`) et `/portail/connexion`
+(clients → `/portail`). Le hook `session.create.before` refuse de créer une session pour un
+compte de l'autre famille. Chaque layout **et** chaque page appelle `requireEspace()` : sans
+session, redirection vers la connexion ; mauvaise famille, `forbidden()` (HTTP 403).
 
 ## Monorepo
 
@@ -48,10 +103,19 @@ bundle du worker.
   `packages/core/src/queues.ts`. Le processeur valide le payload avec ce schéma.
 - **Base de données** : tables dans `packages/db/src/schema/` exportées par `schema/index.ts`,
   puis `pnpm db:generate` et `pnpm db:migrate`. Ne jamais modifier une migration déjà
-  appliquée.
+  appliquée. Les requêtes vivent dans `packages/db/src/requetes/` et sélectionnent leurs
+  colonnes explicitement (`hilaac_app` n'a pas accès à toutes les colonnes de `utilisateur`).
+- **Piège Drizzle** : dans une requête à table unique, Drizzle n'écrit pas le nom de table devant
+  les colonnes ; une sous-requête corrélée dans `select({ … sql\`(select … where x = ${table.col})\` })`
+compare alors la sous-requête avec elle-même, sans erreur. Utiliser une jointure sur une
+sous-requête agrégée (`.as("alias")`, alias de colonnes uniques).
+- **Seed** : identifiants UUID v5 (`idDemo`), horodatages déterministes, upsert de toutes les
+  colonnes ; rejouer `pnpm db:seed` donne exactement le même état. Données entièrement fictives.
 - **Journalisation du worker** : pino, JSON en production, `pino-pretty` en développement.
 - **UI** : composants shadcn/ui dans `apps/web/src/components/ui` (`pnpm dlx shadcn@4.21.4 add <composant>`
-  depuis `apps/web`).
+  depuis `apps/web`). Ces fichiers ne sont pas modifiés à la main et échappent aux règles ESLint
+  typées ; la CLI peut installer des dépendances manquantes ou inattendues, vérifier
+  `package.json` après chaque ajout.
 - **Dépendances** : versions exactes (`saveExact: true`). Tout script d'installation natif
   doit être approuvé explicitement (`allowBuilds` dans `pnpm-workspace.yaml`).
 - **Réserve ESLint 10** : `eslint-config-next@16.4.0` embarque `eslint-plugin-import@2.32.0`,

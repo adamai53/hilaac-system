@@ -14,11 +14,30 @@ Plateforme interne de pilotage digital des entités du groupe.
 
 ```bash
 pnpm install
-pnpm local:setup   # crée .env depuis .env.example, lance Postgres/Redis/Mailpit, applique les migrations
+pnpm local:setup   # crée .env, lance Postgres/Redis/Mailpit, applique les migrations et le seed
 pnpm dev           # démarre apps/web (http://localhost:3000) et apps/worker
 ```
 
 Vérification : `curl http://localhost:3000/api/health` renvoie `200` avec l'état de Postgres et de Redis.
+
+## Comptes de démonstration
+
+Créés par `pnpm db:seed` (idempotent, refusé si `NODE_ENV=production`). Entités, personnes et
+chiffres sont **entièrement fictifs**. Mot de passe commun : **`Demo-Hilaac-2026`**.
+
+| Compte                             | Rôle            | Entité             | Se connecter sur                        |
+| ---------------------------------- | --------------- | ------------------ | --------------------------------------- |
+| `admin@hilaac.test`                | admin           | toutes             | http://localhost:3000/connexion         |
+| `direction@hilaac.test`            | direction       | toutes             | http://localhost:3000/connexion         |
+| `lead@hilaac.test`                 | lead            | toutes             | http://localhost:3000/connexion         |
+| `lea.martin@hilaac.test`           | membre          | suit les trois     | http://localhost:3000/connexion         |
+| `omar.said@hilaac.test`            | membre          | suit les trois     | http://localhost:3000/connexion         |
+| `referent@kelvane-logistique.test` | referent_client | Kelvane Logistique | http://localhost:3000/portail/connexion |
+| `referent@hotels-sablon.test`      | referent_client | Hôtels Sablon      | http://localhost:3000/portail/connexion |
+| `lecteur@clinique-orvia.test`      | lecteur_client  | Clinique Orvia     | http://localhost:3000/portail/connexion |
+
+Léa Martin est affectée aux projets Kelvane et Sablon, Omar Saïd au projet Orvia : chacun ne voit
+que ses projets (plus, pour Omar, une tâche Kelvane dont il est responsable).
 
 ## Services locaux
 
@@ -37,10 +56,10 @@ Vérification : `curl http://localhost:3000/api/health` renvoie `200` avec l'ét
 | `pnpm db:down`     | Arrête les conteneurs (les volumes sont conservés)        |
 | `pnpm db:generate` | Génère une migration à partir de `packages/db/src/schema` |
 | `pnpm db:migrate`  | Applique les migrations                                   |
-| `pnpm db:seed`     | Exécute le seed                                           |
+| `pnpm db:seed`     | Insère le jeu de démonstration (rejouable)                |
 | `pnpm lint`        | ESLint sur tout le monorepo                               |
 | `pnpm typecheck`   | Vérification TypeScript de chaque workspace               |
-| `pnpm test`        | Tests unitaires Vitest                                    |
+| `pnpm test`        | Vitest, dont l'isolation RLS sur la base locale (`db:up`) |
 | `pnpm test:e2e`    | Tests Playwright (Postgres et Redis doivent tourner)      |
 | `pnpm build`       | Build de production de web et worker                      |
 | `pnpm format`      | Formatage Prettier                                        |
@@ -54,7 +73,7 @@ docker build -f apps/web/Dockerfile -t hilaac-web .
 docker build -f apps/worker/Dockerfile -t hilaac-worker .
 ```
 
-Les variables d'environnement sont fournies au lancement du conteneur (`DATABASE_URL`, `REDIS_URL`, `LOG_LEVEL`), jamais à la construction.
+Les variables d'environnement sont fournies au lancement du conteneur, jamais à la construction : `DATABASE_URL_APP`, `DATABASE_URL_AUTH`, `REDIS_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` pour web ; `REDIS_URL`, `LOG_LEVEL` pour worker.
 
 ## Télémétrie
 

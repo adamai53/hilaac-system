@@ -1,5 +1,4 @@
-import { pingDatabase } from "@hilaac/db";
-import { getDb } from "@/lib/db";
+import { getAppDb } from "@/lib/db";
 import { pingRedis } from "@/lib/redis";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +30,7 @@ async function runCheck(probe: () => Promise<number>): Promise<CheckResult> {
 
 export async function GET() {
   const [postgres, redis] = await Promise.all([
-    runCheck(() => pingDatabase(getDb())),
+    runCheck(() => getAppDb().ping()),
     runCheck(pingRedis),
   ]);
   const healthy = postgres.status === "up" && redis.status === "up";

@@ -8,3 +8,4 @@ if (!existsSync(".env")) {
 
 execSync("pnpm db:up", { stdio: "inherit" });
 execSync("pnpm db:migrate", { stdio: "inherit" });
+execSync("pnpm db:seed", { stdio: "inherit" });

@@ -21,3 +21,4 @@ export function createDatabase(url: string, options: DatabaseOptions = {}) {
 }
 
 export type Database = ReturnType<typeof createDatabase>["db"];
+export type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];

@@ -1,13 +1,26 @@
 import { z } from "zod";
 
 const redisUrlSchema = z.url({ protocol: /^rediss?$/ });
+const postgresUrlSchema = z.url({ protocol: /^postgres(ql)?$/ });
 
+/** Connexion propriétaire : migrations et seed uniquement. */
 export const databaseEnvSchema = z.object({
-  DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+  DATABASE_URL: postgresUrlSchema,
 });
 
-export const webEnvSchema = databaseEnvSchema.extend({
+/** db:migrate pose le mot de passe de chaque rôle de connexion à partir de son URL. */
+export const migrationEnvSchema = databaseEnvSchema.extend({
+  DATABASE_URL_APP: postgresUrlSchema,
+  DATABASE_URL_AUTH: postgresUrlSchema,
+  DATABASE_URL_WORKER: postgresUrlSchema,
+});
+
+export const webEnvSchema = z.object({
+  DATABASE_URL_APP: postgresUrlSchema,
+  DATABASE_URL_AUTH: postgresUrlSchema,
   REDIS_URL: redisUrlSchema,
+  BETTER_AUTH_SECRET: z.string().min(32, "32 caractères minimum"),
+  BETTER_AUTH_URL: z.url(),
 });
 
 export const workerEnvSchema = z.object({
@@ -21,6 +34,7 @@ export const workerEnvSchema = z.object({
 });
 
 export type DatabaseEnv = z.infer<typeof databaseEnvSchema>;
+export type MigrationEnv = z.infer<typeof migrationEnvSchema>;
 export type WebEnv = z.infer<typeof webEnvSchema>;
 export type WorkerEnv = z.infer<typeof workerEnvSchema>;
 

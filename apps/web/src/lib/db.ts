@@ -1,14 +1,13 @@
-import { createDatabase } from "@hilaac/db";
+import { createAppDatabase, type AppDatabase } from "@hilaac/db";
 import { getWebEnv } from "./env";
-
-type DatabaseHandle = ReturnType<typeof createDatabase>;
 
 // Conservé sur globalThis pour ne pas multiplier les pools lors du rechargement à chaud.
 const globalForDb = globalThis as typeof globalThis & {
-  hilaacDb?: DatabaseHandle;
+  hilaacAppDb?: AppDatabase;
 };
 
-export function getDb() {
-  globalForDb.hilaacDb ??= createDatabase(getWebEnv().DATABASE_URL);
-  return globalForDb.hilaacDb.db;
+/** Connexion du rôle hilaac_app : toute lecture métier passe par withTenant. */
+export function getAppDb(): AppDatabase {
+  globalForDb.hilaacAppDb ??= createAppDatabase(getWebEnv().DATABASE_URL_APP);
+  return globalForDb.hilaacAppDb;
 }

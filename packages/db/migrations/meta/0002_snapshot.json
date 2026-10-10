@@ -1,0 +1,1798 @@
+{
+  "id": "7c57d63b-a10c-48c5-b3aa-d9238cf1f81c",
+  "prevId": "f4d9d4cf-521c-4454-86d8-682a69ee2341",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.compte": {
+      "name": "compte",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "utilisateur_id": {
+          "name": "utilisateur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "identifiant_compte": {
+          "name": "identifiant_compte",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fournisseur": {
+          "name": "fournisseur",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jeton_acces": {
+          "name": "jeton_acces",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jeton_rafraichissement": {
+          "name": "jeton_rafraichissement",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jeton_identite": {
+          "name": "jeton_identite",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jeton_acces_expire_le": {
+          "name": "jeton_acces_expire_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jeton_rafraichissement_expire_le": {
+          "name": "jeton_rafraichissement_expire_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "portee": {
+          "name": "portee",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mot_de_passe": {
+          "name": "mot_de_passe",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "compte_utilisateur_id_utilisateur_id_fk": {
+          "name": "compte_utilisateur_id_utilisateur_id_fk",
+          "tableFrom": "compte",
+          "columnsFrom": [
+            "utilisateur_id"
+          ],
+          "tableTo": "utilisateur",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.session": {
+      "name": "session",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "utilisateur_id": {
+          "name": "utilisateur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expire_le": {
+          "name": "expire_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "adresse_ip": {
+          "name": "adresse_ip",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "agent_utilisateur": {
+          "name": "agent_utilisateur",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "session_utilisateur_id_utilisateur_id_fk": {
+          "name": "session_utilisateur_id_utilisateur_id_fk",
+          "tableFrom": "session",
+          "columnsFrom": [
+            "utilisateur_id"
+          ],
+          "tableTo": "utilisateur",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "session_token_unique": {
+          "name": "session_token_unique",
+          "columns": [
+            "token"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.utilisateur": {
+      "name": "utilisateur",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nom": {
+          "name": "nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_verifie": {
+          "name": "email_verifie",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "role_utilisateur",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "utilisateur_entite_id_entite_id_fk": {
+          "name": "utilisateur_entite_id_entite_id_fk",
+          "tableFrom": "utilisateur",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "utilisateur_email_unique": {
+          "name": "utilisateur_email_unique",
+          "columns": [
+            "email"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "utilisateur_rattachement_selon_role": {
+          "name": "utilisateur_rattachement_selon_role",
+          "value": "(\"utilisateur\".\"role\" in ('admin', 'direction', 'lead', 'membre') and \"utilisateur\".\"entite_id\" is null)\n        or (\"utilisateur\".\"role\" in ('referent_client', 'lecteur_client') and \"utilisateur\".\"entite_id\" is not null)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.verification": {
+      "name": "verification",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "identifiant": {
+          "name": "identifiant",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valeur": {
+          "name": "valeur",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expire_le": {
+          "name": "expire_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.actif": {
+      "name": "actif",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "type_actif",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "libelle": {
+          "name": "libelle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "identifiant": {
+          "name": "identifiant",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fournisseur": {
+          "name": "fournisseur",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "actif_entite_id_entite_id_fk": {
+          "name": "actif_entite_id_entite_id_fk",
+          "tableFrom": "actif",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "actif_id_entite": {
+          "name": "actif_id_entite",
+          "columns": [
+            "id",
+            "entite_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.entite": {
+      "name": "entite",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nom": {
+          "name": "nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "secteur": {
+          "name": "secteur",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "couleur_marque": {
+          "name": "couleur_marque",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "logo_url": {
+          "name": "logo_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "entite_slug_unique": {
+          "name": "entite_slug_unique",
+          "columns": [
+            "slug"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "entite_couleur_marque_hex": {
+          "name": "entite_couleur_marque_hex",
+          "value": "\"entite\".\"couleur_marque\" ~ '^#[0-9A-Fa-f]{6}$'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.suivi_entite": {
+      "name": "suivi_entite",
+      "schema": "",
+      "columns": {
+        "utilisateur_id": {
+          "name": "utilisateur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "role_suivi",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "suivi_entite_utilisateur_id_utilisateur_id_fk": {
+          "name": "suivi_entite_utilisateur_id_utilisateur_id_fk",
+          "tableFrom": "suivi_entite",
+          "columnsFrom": [
+            "utilisateur_id"
+          ],
+          "tableTo": "utilisateur",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "suivi_entite_entite_id_entite_id_fk": {
+          "name": "suivi_entite_entite_id_entite_id_fk",
+          "tableFrom": "suivi_entite",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "suivi_entite_utilisateur_id_entite_id_pk": {
+          "name": "suivi_entite_utilisateur_id_entite_id_pk",
+          "columns": [
+            "utilisateur_id",
+            "entite_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.affectation_projet": {
+      "name": "affectation_projet",
+      "schema": "",
+      "columns": {
+        "projet_id": {
+          "name": "projet_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "utilisateur_id": {
+          "name": "utilisateur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "affectation_projet_utilisateur_id_utilisateur_id_fk": {
+          "name": "affectation_projet_utilisateur_id_utilisateur_id_fk",
+          "tableFrom": "affectation_projet",
+          "columnsFrom": [
+            "utilisateur_id"
+          ],
+          "tableTo": "utilisateur",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "affectation_projet_entite_id_entite_id_fk": {
+          "name": "affectation_projet_entite_id_entite_id_fk",
+          "tableFrom": "affectation_projet",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "affectation_projet_projet_fk": {
+          "name": "affectation_projet_projet_fk",
+          "tableFrom": "affectation_projet",
+          "columnsFrom": [
+            "projet_id",
+            "entite_id"
+          ],
+          "tableTo": "projet",
+          "columnsTo": [
+            "id",
+            "entite_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "affectation_projet_projet_id_utilisateur_id_pk": {
+          "name": "affectation_projet_projet_id_utilisateur_id_pk",
+          "columns": [
+            "projet_id",
+            "utilisateur_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.demande": {
+      "name": "demande",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "type_demande",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titre": {
+          "name": "titre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brief": {
+          "name": "brief",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "urgence": {
+          "name": "urgence",
+          "type": "urgence_demande",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "statut": {
+          "name": "statut",
+          "type": "statut_demande",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "echeance": {
+          "name": "echeance",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "auteur_id": {
+          "name": "auteur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "demande_entite_id_entite_id_fk": {
+          "name": "demande_entite_id_entite_id_fk",
+          "tableFrom": "demande",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "demande_auteur_id_utilisateur_id_fk": {
+          "name": "demande_auteur_id_utilisateur_id_fk",
+          "tableFrom": "demande",
+          "columnsFrom": [
+            "auteur_id"
+          ],
+          "tableTo": "utilisateur",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "demande_id_entite": {
+          "name": "demande_id_entite",
+          "columns": [
+            "id",
+            "entite_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.jalon": {
+      "name": "jalon",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "projet_id": {
+          "name": "projet_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titre": {
+          "name": "titre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "echeance": {
+          "name": "echeance",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "statut": {
+          "name": "statut",
+          "type": "statut_jalon",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "jalon_entite_id_entite_id_fk": {
+          "name": "jalon_entite_id_entite_id_fk",
+          "tableFrom": "jalon",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "jalon_projet_fk": {
+          "name": "jalon_projet_fk",
+          "tableFrom": "jalon",
+          "columnsFrom": [
+            "projet_id",
+            "entite_id"
+          ],
+          "tableTo": "projet",
+          "columnsTo": [
+            "id",
+            "entite_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "jalon_id_entite": {
+          "name": "jalon_id_entite",
+          "columns": [
+            "id",
+            "entite_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.projet": {
+      "name": "projet",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "demande_id": {
+          "name": "demande_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nom": {
+          "name": "nom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "responsable_id": {
+          "name": "responsable_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "statut": {
+          "name": "statut",
+          "type": "statut_projet",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_debut": {
+          "name": "date_debut",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_fin_prevue": {
+          "name": "date_fin_prevue",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "projet_entite_id_entite_id_fk": {
+          "name": "projet_entite_id_entite_id_fk",
+          "tableFrom": "projet",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "projet_responsable_id_utilisateur_id_fk": {
+          "name": "projet_responsable_id_utilisateur_id_fk",
+          "tableFrom": "projet",
+          "columnsFrom": [
+            "responsable_id"
+          ],
+          "tableTo": "utilisateur",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "projet_demande_fk": {
+          "name": "projet_demande_fk",
+          "tableFrom": "projet",
+          "columnsFrom": [
+            "demande_id",
+            "entite_id"
+          ],
+          "tableTo": "demande",
+          "columnsTo": [
+            "id",
+            "entite_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "projet_id_entite": {
+          "name": "projet_id_entite",
+          "columns": [
+            "id",
+            "entite_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tache": {
+      "name": "tache",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "projet_id": {
+          "name": "projet_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jalon_id": {
+          "name": "jalon_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "titre": {
+          "name": "titre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "responsable_id": {
+          "name": "responsable_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "equipe": {
+          "name": "equipe",
+          "type": "equipe_tache",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "statut": {
+          "name": "statut",
+          "type": "statut_tache",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "echeance": {
+          "name": "echeance",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "tache_entite_id_entite_id_fk": {
+          "name": "tache_entite_id_entite_id_fk",
+          "tableFrom": "tache",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "tache_responsable_id_utilisateur_id_fk": {
+          "name": "tache_responsable_id_utilisateur_id_fk",
+          "tableFrom": "tache",
+          "columnsFrom": [
+            "responsable_id"
+          ],
+          "tableTo": "utilisateur",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "tache_projet_fk": {
+          "name": "tache_projet_fk",
+          "tableFrom": "tache",
+          "columnsFrom": [
+            "projet_id",
+            "entite_id"
+          ],
+          "tableTo": "projet",
+          "columnsTo": [
+            "id",
+            "entite_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "tache_jalon_fk": {
+          "name": "tache_jalon_fk",
+          "tableFrom": "tache",
+          "columnsFrom": [
+            "jalon_id",
+            "entite_id"
+          ],
+          "tableTo": "jalon",
+          "columnsTo": [
+            "id",
+            "entite_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "tache_id_entite": {
+          "name": "tache_id_entite",
+          "columns": [
+            "id",
+            "entite_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tache_dependance": {
+      "name": "tache_dependance",
+      "schema": "",
+      "columns": {
+        "tache_id": {
+          "name": "tache_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "depend_de_id": {
+          "name": "depend_de_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "tache_dependance_entite_id_entite_id_fk": {
+          "name": "tache_dependance_entite_id_entite_id_fk",
+          "tableFrom": "tache_dependance",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "tache_dependance_tache_fk": {
+          "name": "tache_dependance_tache_fk",
+          "tableFrom": "tache_dependance",
+          "columnsFrom": [
+            "tache_id",
+            "entite_id"
+          ],
+          "tableTo": "tache",
+          "columnsTo": [
+            "id",
+            "entite_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "tache_dependance_depend_de_fk": {
+          "name": "tache_dependance_depend_de_fk",
+          "tableFrom": "tache_dependance",
+          "columnsFrom": [
+            "depend_de_id",
+            "entite_id"
+          ],
+          "tableTo": "tache",
+          "columnsTo": [
+            "id",
+            "entite_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "tache_dependance_tache_id_depend_de_id_pk": {
+          "name": "tache_dependance_tache_id_depend_de_id_pk",
+          "columns": [
+            "tache_id",
+            "depend_de_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "tache_dependance_distincte": {
+          "name": "tache_dependance_distincte",
+          "value": "\"tache_dependance\".\"tache_id\" <> \"tache_dependance\".\"depend_de_id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.journal_audit": {
+      "name": "journal_audit",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "acteur_id": {
+          "name": "acteur_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action": {
+          "name": "action",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cible_type": {
+          "name": "cible_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cible_id": {
+          "name": "cible_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "horodatage": {
+          "name": "horodatage",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "etat_avant": {
+          "name": "etat_avant",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "journal_audit_entite_id_entite_id_fk": {
+          "name": "journal_audit_entite_id_entite_id_fk",
+          "tableFrom": "journal_audit",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "journal_audit_acteur_id_utilisateur_id_fk": {
+          "name": "journal_audit_acteur_id_utilisateur_id_fk",
+          "tableFrom": "journal_audit",
+          "columnsFrom": [
+            "acteur_id"
+          ],
+          "tableTo": "utilisateur",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.mesure": {
+      "name": "mesure",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "source_mesure",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cle_metrique": {
+          "name": "cle_metrique",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dimension": {
+          "name": "dimension",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'total'"
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valeur": {
+          "name": "valeur",
+          "type": "numeric(18, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collecte_le": {
+          "name": "collecte_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "mesure_entite_id_entite_id_fk": {
+          "name": "mesure_entite_id_entite_id_fk",
+          "tableFrom": "mesure",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "mesure_unique_par_jour": {
+          "name": "mesure_unique_par_jour",
+          "columns": [
+            "entite_id",
+            "source",
+            "cle_metrique",
+            "dimension",
+            "date"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.publication": {
+      "name": "publication",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actif_id": {
+          "name": "actif_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reseau": {
+          "name": "reseau",
+          "type": "reseau_social",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contenu": {
+          "name": "contenu",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "programmee_le": {
+          "name": "programmee_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "statut": {
+          "name": "statut",
+          "type": "statut_publication",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cree_le": {
+          "name": "cree_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "mis_a_jour_le": {
+          "name": "mis_a_jour_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "publication_entite_id_entite_id_fk": {
+          "name": "publication_entite_id_entite_id_fk",
+          "tableFrom": "publication",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "publication_actif_fk": {
+          "name": "publication_actif_fk",
+          "tableFrom": "publication",
+          "columnsFrom": [
+            "actif_id",
+            "entite_id"
+          ],
+          "tableTo": "actif",
+          "columnsTo": [
+            "id",
+            "entite_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.raw_payload": {
+      "name": "raw_payload",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "endpoint": {
+          "name": "endpoint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collecte_le": {
+          "name": "collecte_le",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "charge": {
+          "name": "charge",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "raw_payload_entite_id_entite_id_fk": {
+          "name": "raw_payload_entite_id_entite_id_fk",
+          "tableFrom": "raw_payload",
+          "columnsFrom": [
+            "entite_id"
+          ],
+          "tableTo": "entite",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.equipe_tache": {
+      "name": "equipe_tache",
+      "schema": "public",
+      "values": [
+        "dev",
+        "graphisme",
+        "redaction",
+        "photo_video",
+        "marketing"
+      ]
+    },
+    "public.reseau_social": {
+      "name": "reseau_social",
+      "schema": "public",
+      "values": [
+        "facebook",
+        "linkedin"
+      ]
+    },
+    "public.role_suivi": {
+      "name": "role_suivi",
+      "schema": "public",
+      "values": [
+        "referent",
+        "contributeur"
+      ]
+    },
+    "public.role_utilisateur": {
+      "name": "role_utilisateur",
+      "schema": "public",
+      "values": [
+        "admin",
+        "direction",
+        "lead",
+        "membre",
+        "referent_client",
+        "lecteur_client"
+      ]
+    },
+    "public.source_mesure": {
+      "name": "source_mesure",
+      "schema": "public",
+      "values": [
+        "ga4",
+        "facebook",
+        "linkedin",
+        "formulaire_site"
+      ]
+    },
+    "public.statut_demande": {
+      "name": "statut_demande",
+      "schema": "public",
+      "values": [
+        "a_qualifier",
+        "qualifiee",
+        "en_cours",
+        "en_attente_validation",
+        "terminee",
+        "refusee"
+      ]
+    },
+    "public.statut_jalon": {
+      "name": "statut_jalon",
+      "schema": "public",
+      "values": [
+        "a_venir",
+        "en_cours",
+        "atteint"
+      ]
+    },
+    "public.statut_projet": {
+      "name": "statut_projet",
+      "schema": "public",
+      "values": [
+        "planifie",
+        "en_cours",
+        "en_pause",
+        "termine"
+      ]
+    },
+    "public.statut_publication": {
+      "name": "statut_publication",
+      "schema": "public",
+      "values": [
+        "brouillon",
+        "en_validation",
+        "programmee",
+        "publiee",
+        "echec"
+      ]
+    },
+    "public.statut_tache": {
+      "name": "statut_tache",
+      "schema": "public",
+      "values": [
+        "a_faire",
+        "en_cours",
+        "en_revue",
+        "bloquee",
+        "terminee"
+      ]
+    },
+    "public.type_actif": {
+      "name": "type_actif",
+      "schema": "public",
+      "values": [
+        "site",
+        "domaine",
+        "hebergement",
+        "compte_social",
+        "compte_mesure"
+      ]
+    },
+    "public.type_demande": {
+      "name": "type_demande",
+      "schema": "public",
+      "values": [
+        "site_web",
+        "contenu_social",
+        "campagne",
+        "seo",
+        "maintenance",
+        "autre"
+      ]
+    },
+    "public.urgence_demande": {
+      "name": "urgence_demande",
+      "schema": "public",
+      "values": [
+        "basse",
+        "normale",
+        "haute",
+        "critique"
+      ]
+    }
+  },
+  "schemas": {},
+  "views": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

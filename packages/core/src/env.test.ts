@@ -7,8 +7,11 @@ import {
 } from "./env";
 
 const validWebEnv = {
-  DATABASE_URL: "postgres://user:pass@localhost:5432/db",
+  DATABASE_URL_APP: "postgres://app:pass@localhost:5432/db",
+  DATABASE_URL_AUTH: "postgres://auth:pass@localhost:5432/db",
   REDIS_URL: "redis://localhost:6379",
+  BETTER_AUTH_SECRET: "x".repeat(32),
+  BETTER_AUTH_URL: "http://localhost:3000",
 };
 
 describe("parseEnv", () => {
@@ -31,7 +34,8 @@ describe("parseEnv", () => {
     const parse = () => parseEnv(webEnvSchema, "web", {});
     expect(parse).toThrow(EnvValidationError);
     expect(parse).toThrow(/Configuration invalide pour web/);
-    expect(parse).toThrow(/DATABASE_URL : variable manquante/);
+    expect(parse).toThrow(/DATABASE_URL_APP : variable manquante/);
+    expect(parse).toThrow(/BETTER_AUTH_SECRET : variable manquante/);
     expect(parse).toThrow(/REDIS_URL : variable manquante/);
   });
 
@@ -39,9 +43,9 @@ describe("parseEnv", () => {
     const parse = () =>
       parseEnv(webEnvSchema, "web", {
         ...validWebEnv,
-        DATABASE_URL: "mysql://localhost/db",
+        DATABASE_URL_APP: "mysql://localhost/db",
       });
-    expect(parse).toThrow(/DATABASE_URL : /);
-    expect(parse).not.toThrow(/DATABASE_URL : variable manquante/);
+    expect(parse).toThrow(/DATABASE_URL_APP : /);
+    expect(parse).not.toThrow(/DATABASE_URL_APP : variable manquante/);
   });
 });

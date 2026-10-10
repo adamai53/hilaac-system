@@ -39,6 +39,11 @@ export default defineConfig(
     files: ["**/*.mjs"],
     extends: [tseslint.configs.disableTypeChecked],
   },
+  // Composants copiés par la CLI shadcn : non modifiés, pour rester mis à jour par `shadcn add`.
+  {
+    files: ["apps/web/src/components/ui/**"],
+    extends: [tseslint.configs.disableTypeChecked],
+  },
 
   ...nextCoreWebVitals.map((config) => ({ ...config, files: WEB_FILES })),
   {

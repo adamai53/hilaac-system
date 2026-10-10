@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -6,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function HomePage() {
+export default function AccueilPublic() {
   return (
     <main className="flex min-h-dvh items-center justify-center p-6">
       <Card className="w-full max-w-md">
@@ -18,14 +19,16 @@ export default function HomePage() {
             Plateforme interne de pilotage digital du groupe.
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-muted-foreground">
-          État des services :{" "}
-          <a
-            className="text-foreground underline underline-offset-4"
-            href="/api/health"
+        <CardContent className="grid gap-2 text-sm">
+          <Link className="underline underline-offset-4" href="/connexion">
+            Espace équipe
+          </Link>
+          <Link
+            className="underline underline-offset-4"
+            href="/portail/connexion"
           >
-            /api/health
-          </a>
+            Portail client
+          </Link>
         </CardContent>
       </Card>
     </main>

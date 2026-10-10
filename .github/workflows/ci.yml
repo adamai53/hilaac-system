@@ -16,6 +16,21 @@ env:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    # Les tests d'isolation RLS s'exécutent sur un PostgreSQL réel.
+    services:
+      postgres:
+        image: postgres:16.15-alpine
+        env:
+          POSTGRES_USER: hilaac
+          POSTGRES_PASSWORD: hilaac
+          POSTGRES_DB: hilaac
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hilaac -d hilaac"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
     steps:
       - uses: actions/checkout@v7
 
@@ -36,7 +51,8 @@ jobs:
         run: pnpm typecheck
 
       - name: Test
-        run: pnpm test
+        # Valeurs locales de .env.example, alignées sur le service postgres ci-dessus.
+        run: cp .env.example .env && pnpm test
 
       - name: Build
         run: pnpm build
