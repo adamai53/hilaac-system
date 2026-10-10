@@ -109,6 +109,9 @@ bundle du worker.
   les colonnes ; une sous-requête corrélée dans `select({ … sql\`(select … where x = ${table.col})\` })`
 compare alors la sous-requête avec elle-même, sans erreur. Utiliser une jointure sur une
 sous-requête agrégée (`.as("alias")`, alias de colonnes uniques).
+- **Types Next générés** : ne pas utiliser `PageProps<…>` / `LayoutProps<…>` (créés par
+  `next typegen` dans `.next/`) ; la CI lance le lint avant le typecheck, sans `.next`. Typer
+  `params` explicitement : `{ params: Promise<{ id: string }> }`.
 - **Seed** : identifiants UUID v5 (`idDemo`), horodatages déterministes, upsert de toutes les
   colonnes ; rejouer `pnpm db:seed` donne exactement le même état. Données entièrement fictives.
 - **Journalisation du worker** : pino, JSON en production, `pino-pretty` en développement.

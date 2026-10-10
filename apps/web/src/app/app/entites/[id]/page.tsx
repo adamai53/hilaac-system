@@ -30,7 +30,9 @@ export const metadata = { title: "Fiche entité — HILAAC · Équipe" };
 
 export default async function FicheEntite({
   params,
-}: PageProps<"/app/entites/[id]">) {
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const utilisateur = await requireEspace("equipe");
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
